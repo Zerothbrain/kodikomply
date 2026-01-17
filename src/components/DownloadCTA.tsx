@@ -28,13 +28,15 @@ const DownloadCTA = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="gap-2 text-lg px-10 py-6 font-semibold shadow-lg hover:shadow-xl transition-all">
-              <Download className="w-5 h-5" />
-              Download for Android
+            <Button asChild size="lg" variant="secondary" className="gap-2 text-lg px-10 py-6 font-semibold shadow-lg hover:shadow-xl transition-all">
+              <a href="/downloads/KodiKomply.apk" download>
+                <Download className="w-5 h-5" />
+                Download for Android
+              </a>
             </Button>
-            <Button size="lg" variant="outline" className="gap-2 text-lg px-10 py-6 font-semibold border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
+            <Button size="lg" variant="outline" className="gap-2 text-lg px-10 py-6 font-semibold border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 opacity-50 cursor-not-allowed" disabled>
               <Download className="w-5 h-5" />
-              Download for iOS
+              iOS Coming Soon
             </Button>
           </div>
 
