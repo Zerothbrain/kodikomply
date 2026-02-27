@@ -3,10 +3,12 @@ import Features from "@/components/Features";
 import HowItWorks from "@/components/HowItWorks";
 import DownloadCTA from "@/components/DownloadCTA";
 import Footer from "@/components/Footer";
+import ParticleBackground from "@/components/ParticleBackground";
 
 const Index = () => {
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen relative">
+      <ParticleBackground />
       <Hero />
       <Features />
       <HowItWorks />

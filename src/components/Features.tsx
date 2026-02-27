@@ -1,4 +1,6 @@
 import { Calendar, Calculator, Bell, FileText, Shield, Clock } from "lucide-react";
+import AnimatedSection from "./AnimatedSection";
+import { motion } from "framer-motion";
 
 const features = [
   {
@@ -41,9 +43,9 @@ const features = [
 
 const Features = () => {
   return (
-    <section className="py-20 lg:py-28 bg-background">
+    <section className="py-20 lg:py-28 bg-background relative z-10">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <AnimatedSection className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-primary font-semibold text-sm uppercase tracking-wider">
             Features
           </span>
@@ -53,16 +55,19 @@ const Features = () => {
           <p className="text-muted-foreground text-lg">
             KodiKomply brings all the tools you need to stay compliant in one simple app.
           </p>
-        </div>
+        </AnimatedSection>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {features.map((feature, index) => (
-            <div
+            <motion.div
               key={feature.title}
-              className="group p-6 lg:p-8 bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-lg transition-all duration-300"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="group p-6 lg:p-8 bg-card rounded-2xl border border-border hover:border-primary/30 hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <div className={`w-12 h-12 rounded-xl ${feature.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
+              <div className={`w-12 h-12 rounded-xl ${feature.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
                 <feature.icon className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-card-foreground mb-2">
@@ -71,7 +76,7 @@ const Features = () => {
               <p className="text-muted-foreground leading-relaxed">
                 {feature.description}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
