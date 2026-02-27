@@ -1,4 +1,6 @@
 import { Download, UserCheck, Smartphone } from "lucide-react";
+import AnimatedSection from "./AnimatedSection";
+import { motion } from "framer-motion";
 
 const steps = [
   {
@@ -23,9 +25,9 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="py-20 lg:py-28 bg-muted">
+    <section className="py-20 lg:py-28 bg-muted relative z-10">
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <AnimatedSection className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-primary font-semibold text-sm uppercase tracking-wider">
             How It Works
           </span>
@@ -35,11 +37,18 @@ const HowItWorks = () => {
           <p className="text-muted-foreground text-lg">
             Begin your journey to stress-free tax compliance today.
           </p>
-        </div>
+        </AnimatedSection>
 
         <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
           {steps.map((item, index) => (
-            <div key={item.step} className="relative text-center">
+            <motion.div
+              key={item.step}
+              className="relative text-center"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.7, delay: index * 0.2 }}
+            >
               {/* Connector line */}
               {index < steps.length - 1 && (
                 <div className="hidden md:block absolute top-16 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-primary/30 to-transparent" />
@@ -60,7 +69,7 @@ const HowItWorks = () => {
               <p className="text-muted-foreground max-w-xs mx-auto">
                 {item.description}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
