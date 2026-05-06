@@ -81,15 +81,18 @@ function formatTime(date: Date): string {
   return date.toLocaleTimeString('en-TZ', { hour: '2-digit', minute: '2-digit' });
 }
 
-function parseMessageContent(text: string): React.ReactNode[] {
-  // Split on [Go to: MODULE_NAME] patterns
+type MessagePart =
+  | { type: 'module'; key: string; index: number }
+  | { type: 'text'; content: string; index: number };
+
+function parseMessageContent(text: string): MessagePart[] {
   const parts = text.split(/(\[Go to: [A-Z_]+\])/g);
   return parts.map((part, i) => {
     const match = part.match(/\[Go to: ([A-Z_]+)\]/);
     if (match) {
-      return { type: 'module', key: match[1], index: i };
+      return { type: 'module' as const, key: match[1], index: i };
     }
-    return { type: 'text', content: part, index: i };
+    return { type: 'text' as const, content: part, index: i };
   });
 }
 
@@ -108,7 +111,7 @@ function MessageBubble({ msg, onNavigate }: { msg: ChatMessage; onNavigate: (pat
             : 'bg-white text-gray-800 border border-gray-200 rounded-bl-sm shadow-sm'
         }`}
       >
-        {parts.map((part: any) => {
+        {parts.map((part) => {
           if (part.type === 'module') {
             const route = MODULE_ROUTES[part.key];
             const label = MODULE_LABELS[part.key] || part.key;
