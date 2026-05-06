@@ -1,0 +1,433 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int                @id @default(autoincrement())
+  name              String
+  email             String             @unique
+  password          String
+  role              String             @default("USER")
+  isActive          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  calculations          Calculation[]
+  lossCarryforwards     LossCarryforward[]
+  contracts             ContractLongTerm[]
+  taxProfile            UserTaxProfile?
+  reviews               Review[]
+  isEmailVerified       Boolean   @default(false)
+  emailVerificationToken String?
+  emailVerificationExpiry DateTime?
+
+  @@map("users")
+}
+
+model UserTaxProfile {
+  id                Int      @id @default(autoincrement())
+  userId            Int      @unique
+  user              User     @relation(fields: [userId], references: [id])
+  entityType        String
+  activityTypes     String
+  residentStatus    String
+  hasEmployees      Boolean  @default(false)
+  turnoverBand      String
+  applicableModules String
+  completedModules  String   @default("[]")
+  moduleData        String   @default("{}")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("user_tax_profiles")
+}
+
+model TaxRule {
+  id            Int       @id @default(autoincrement())
+  category      String
+  name          String
+  minValue      Float?
+  maxValue      Float?
+  rate          Float?
+  fixedAmount   Float?
+  valueType     String
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
+  isActive      Boolean   @default(true)
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("tax_rules")
+}
+
+model Deduction {
+  id             Int       @id @default(autoincrement())
+  name           String
+  category       String
+  maxAmount      Float?
+  isPercentage   Boolean   @default(false)
+  percentageRate Float?
+  conditions     String?
+  isActive       Boolean   @default(true)
+  effectiveFrom  DateTime
+  effectiveTo    DateTime?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map("deductions")
+}
+
+model Exemption {
+  id           Int      @id @default(autoincrement())
+  name         String
+  applicableTo String   @default("ALL")
+  conditions   String?
+  isActive     Boolean  @default(true)
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("exemptions")
+}
+
+model Inclusion {
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String?
+  valuationMethod String?
+  isActive        Boolean  @default(true)
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("inclusions")
+}
+
+model WithholdingRate {
+  id            Int       @id @default(autoincrement())
+  paymentType   String
+  recipientType String
+  rate          Float
+  isFinal       Boolean   @default(false)
+  notes         String?
+  isActive      Boolean   @default(true)
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("withholding_rates")
+}
+
+model FilingDeadline {
+  id            Int       @id @default(autoincrement())
+  taxType       String
+  description   String
+  dueDayOfMonth Int
+  dueMonth      Int?
+  frequency     String
+  reminderDays  Int       @default(7)
+  notes         String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("filing_deadlines")
+}
+
+model CorporateRate {
+  id         Int       @id @default(autoincrement())
+  entityType String
+  rate       Float
+  conditions String?
+  startDate  DateTime
+  endDate    DateTime?
+  isActive   Boolean   @default(true)
+  notes      String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@map("corporate_rates")
+}
+
+model Calculation {
+  id              Int      @id @default(autoincrement())
+  userId          Int?
+  calculationType String
+  inputData       String
+  resultData      String
+  createdAt       DateTime @default(now())
+  user            User?    @relation(fields: [userId], references: [id])
+
+  @@map("calculations")
+}
+
+// ── NEW MODELS ────────────────────────────────────────────────────────────────
+
+model Partnership {
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  registrationNumber String?
+  tinNumber          String?
+  yearOfIncome       Int
+  createdAt          DateTime             @default(now())
+  partners           PartnershipPartner[]
+
+  @@map("partnerships")
+}
+
+model PartnershipPartner {
+  id              Int         @id @default(autoincrement())
+  partnershipId   Int
+  partnerName     String
+  percentageShare Float
+  tinNumber       String?
+  partnership     Partnership @relation(fields: [partnershipId], references: [id])
+
+  @@map("partnership_partners")
+}
+
+model RetirementFund {
+  id         Int      @id @default(autoincrement())
+  name       String
+  type       String   // APPROVED, UNAPPROVED
+  isResident Boolean  @default(true)
+  isActive   Boolean  @default(true)
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("retirement_funds")
+}
+
+model LossCarryforward {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  yearOfIncome   Int
+  lossAmount     Float
+  amountUtilised Float    @default(0)
+  remainingLoss  Float
+  businessId     String?
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@map("loss_carryforwards")
+}
+
+model BenefitInKind {
+  id                  Int      @id @default(autoincrement())
+  name                String
+  valuationMethod     String
+  valuationTable      String?  // JSON string for structured benefit tables
+  isExempt            Boolean  @default(false)
+  exemptionConditions String?
+  isActive            Boolean  @default(true)
+  notes               String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("benefits_in_kind")
+}
+
+model Translation {
+  id        Int      @id @default(autoincrement())
+  language  String   // EN, SW
+  key       String
+  value     String
+  category  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([language, key])
+  @@map("translations")
+}
+
+model ExemptAmount {
+  id             Int      @id @default(autoincrement())
+  name           String
+  description    String
+  applicableTo   String
+  conditions     String?
+  legalReference String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("exempt_amounts")
+}
+
+model ContractLongTerm {
+  id                        Int       @id @default(autoincrement())
+  userId                    Int
+  contractName              String
+  totalValue                Float
+  estimatedTotalExpenditure Float
+  startDate                 DateTime
+  completionDate            DateTime?
+  yearOfIncome              Int
+  createdAt                 DateTime  @default(now())
+  user                      User      @relation(fields: [userId], references: [id])
+
+  @@map("contracts_long_term")
+}
+
+model VatExemptItem {
+  id            Int       @id @default(autoincrement())
+  category      String
+  itemName      String
+  hsCode        String?
+  exemptionType String    // EXEMPT / ZERO_RATED / TAXABLE
+  conditions    String?
+  isActive      Boolean   @default(true)
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("vat_exempt_items")
+}
+
+model VatExemptImport {
+  id          Int      @id @default(autoincrement())
+  itemNumber  Int
+  description String
+  conditions  String?
+  isActive    Boolean  @default(true)
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  @@map("vat_exempt_imports")
+}
+
+model RealEstateVatRule {
+  id              Int       @id @default(autoincrement())
+  transactionType String    // SALE / LEASE / HIRE
+  propertyType    String    // VACANT_LAND / RESIDENTIAL / COMMERCIAL
+  condition       String    // NEW / EXISTING_2YR_PLUS / EXISTING_UNDER_2YR / DEVELOPER / ANY
+  vatTreatment    String    // EXEMPT / TAXABLE
+  threshold       Float?
+  notes           String?
+  isActive        Boolean   @default(true)
+  effectiveFrom   DateTime
+  effectiveTo     DateTime?
+
+  @@map("real_estate_vat_rules")
+}
+
+model VehicleBenefitTable {
+  id                   Int       @id @default(autoincrement())
+  engineSizeFrom       Int
+  engineSizeTo         Int?
+  monthlyNewVehicle    Float
+  monthlyOldVehicle    Float
+  vehicleAgeThreshold  Int       @default(5)
+  isActive             Boolean   @default(true)
+  effectiveFrom        DateTime
+  effectiveTo          DateTime?
+
+  @@map("vehicle_benefit_table")
+}
+
+model DigitalServiceType {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("digital_service_types")
+}
+
+model TreatyCountry {
+  id          Int      @id @default(autoincrement())
+  countryName String
+  countryCode String?
+  hasFullTreaty Boolean @default(false)
+  notes       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@map("treaty_countries")
+}
+
+// ── AI CHAT ───────────────────────────────────────────────────────────────────
+
+model SystemPrompt {
+  id        Int      @id @default(autoincrement())
+  content   String
+  version   Int
+  isActive  Boolean  @default(true)
+  updatedBy Int
+  createdAt DateTime @default(now())
+
+  @@map("system_prompts")
+}
+
+model ChatSession {
+  id          Int      @id @default(autoincrement())
+  userId      Int?
+  sessionDate DateTime @default(now())
+  language    String   @default("EN")
+  messages    String   @default("[]")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("chat_sessions")
+}
+
+model ChatUsage {
+  id           Int      @id @default(autoincrement())
+  userId       Int?
+  date         String
+  messageCount Int      @default(0)
+  dailyLimit   Int      @default(20)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@map("chat_usage")
+}
+
+// ── EMAIL TEMPLATES ───────────────────────────────────────────────────────────
+
+model EmailTemplate {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  name        String
+  subject     String
+  htmlBody    String
+  textBody    String
+  variables   String   @default("[]")
+  isActive    Boolean  @default(true)
+  updatedBy   Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("email_templates")
+}
+
+// ── REVIEWS ───────────────────────────────────────────────────────────────────
+
+model Review {
+  id          Int      @id @default(autoincrement())
+  userId      Int?
+  name        String
+  role        String?
+  rating      Int
+  comment     String
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User?    @relation(fields: [userId], references: [id])
+
+  @@map("reviews")
+}

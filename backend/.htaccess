@@ -1,0 +1,10 @@
+# Proxy all /api requests to Node.js backend on port 4000
+# cPanel NodeJS Selector handles this — configure via cPanel UI
+# Application URL: /api
+# Application startup file: dist/index.js
+# Node.js version: 20.x
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^(.*)$ http://localhost:4000/api/$1 [P,L]
+</IfModule>

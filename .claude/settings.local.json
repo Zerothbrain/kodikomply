@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(curl -s http://localhost:4000/api/health)",
+      "Bash(curl -s \"http://localhost:3000/_next/static/css/app/layout.css\")",
+      "Bash(curl -s http://localhost:4000/api/calculator/employment -X POST -H \"Content-Type: application/json\" -d '{\"employmentIncome\":1000000}')",
+      "Bash(curl -s http://localhost:4000/api/calculator/vehicle-benefit -X POST -H 'Content-Type: application/json' -d '{\"engineCC\":1500,\"vehicleAgeYears\":3,\"employerClaimsDeduction\":true}')",
+      "Bash(python -c \"import sys,json;d=json.load\\(sys.stdin\\);print\\('Monthly:',d.get\\('monthlyBenefit'\\),'Annual:',d.get\\('annualBenefit'\\),'Taxable:',d.get\\('isTaxable'\\)\\)\")",
+      "Bash(curl -s http://localhost:4000/api/calculator/digital-marketplace -X POST -H 'Content-Type: application/json' -d '{\"grossPaymentFromTanzania\":5000000,\"month\":4,\"year\":2026}')",
+      "Bash(python -c \"import sys,json;d=json.load\\(sys.stdin\\);print\\('Rate:',d.get\\('taxRate'\\),'Due:',d.get\\('taxDue'\\),'Deadline:',d.get\\('filingDeadline'\\)\\)\")",
+      "Bash(curl -s \"http://localhost:4000/api/calculator/digital-service-types\")",
+      "Bash(python -c \"import sys,json;d=json.load\\(sys.stdin\\);print\\('Services:',len\\(d\\)\\)\")",
+      "Bash(npx kill-port *)",
+      "Bash(npx tsc *)",
+      "PowerShell(foreach \\($f in @\\(\"app\\\\page.tsx\",\"app\\\\calculators\\\\page.tsx\",\"app\\\\about\\\\page.tsx\",\"app\\\\auth\\\\login\\\\page.tsx\",\"app\\\\auth\\\\register\\\\page.tsx\"\\)\\) { $first = Get-Content \"C:\\\\Users\\\\ericknoah\\\\Desktop\\\\kodikomply\\\\frontend\\\\$f\" | Select-Object -First 1; Write-Host \"$f -> $first\" })",
+      "PowerShell(foreach \\($f in @\\(\"app\\\\calculator\\\\employment\\\\page.tsx\",\"app\\\\calculator\\\\vat\\\\page.tsx\",\"app\\\\calculator\\\\withholding\\\\page.tsx\"\\)\\) { $first = Get-Content \"C:\\\\Users\\\\ericknoah\\\\Desktop\\\\kodikomply\\\\frontend\\\\$f\" | Select-Object -First 1; Write-Host \"$f -> $first\" })",
+      "PowerShell(Start-Process powershell -ArgumentList '-NoExit', '-Command', 'cd \"C:\\\\Users\\\\ericknoah\\\\Desktop\\\\kodikomply\\\\backend\"; node -e \"require\\(''ts-node/register''\\); require\\(''./src/index.ts''\\)\"')",
+      "PowerShell(Start-Process powershell -ArgumentList '-NoExit', '-Command', 'cd \"C:\\\\Users\\\\ericknoah\\\\Desktop\\\\kodikomply\\\\frontend\"; node node_modules\\\\.bin\\\\next dev')"
+    ]
+  }
+}
