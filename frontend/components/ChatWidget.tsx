@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { X, Send, MessageCircle, ChevronRight, Globe } from 'lucide-react';
-import { getUser, isLoggedIn } from '../lib/auth';
+import { isLoggedIn } from '../lib/auth';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -81,26 +81,11 @@ function formatTime(date: Date): string {
   return date.toLocaleTimeString('en-TZ', { hour: '2-digit', minute: '2-digit' });
 }
 
-type MessagePart =
-  | { type: 'module'; key: string; index: number }
-  | { type: 'text'; content: string; index: number };
-
-function parseMessageContent(text: string): MessagePart[] {
-  const parts = text.split(/(\[Go to: [A-Z_]+\])/g);
-  return parts.map((part, i) => {
-    const match = part.match(/\[Go to: ([A-Z_]+)\]/);
-    if (match) {
-      return { type: 'module' as const, key: match[1], index: i };
-    }
-    return { type: 'text' as const, content: part, index: i };
-  });
-}
-
 // ── Message bubble ─────────────────────────────────────────────────────────────
 
 function MessageBubble({ msg, onNavigate }: { msg: ChatMessage; onNavigate: (path: string) => void }) {
   const isUser = msg.role === 'user';
-  const parts = parseMessageContent(msg.content);
+  const segments = msg.content.split(/(\[Go to: [A-Z_]+\])/g);
 
   return (
     <div className={`flex flex-col mb-3 ${isUser ? 'items-end' : 'items-start'}`}>
@@ -111,14 +96,15 @@ function MessageBubble({ msg, onNavigate }: { msg: ChatMessage; onNavigate: (pat
             : 'bg-white text-gray-800 border border-gray-200 rounded-bl-sm shadow-sm'
         }`}
       >
-        {parts.map((part) => {
-          if (part.type === 'module') {
-            const route = MODULE_ROUTES[part.key];
-            const label = MODULE_LABELS[part.key] || part.key;
+        {segments.map((seg, i) => {
+          const match = seg.match(/\[Go to: ([A-Z_]+)\]/);
+          if (match) {
+            const route = MODULE_ROUTES[match[1]];
+            const label = MODULE_LABELS[match[1]] || match[1];
             if (!route) return null;
             return (
               <button
-                key={part.index}
+                key={i}
                 onClick={() => onNavigate(route)}
                 className="inline-flex items-center gap-1 mt-1 px-3 py-1.5 bg-[#1a5c38] text-white text-xs font-medium rounded-full hover:bg-[#154d2f] transition-colors"
               >
@@ -128,8 +114,8 @@ function MessageBubble({ msg, onNavigate }: { msg: ChatMessage; onNavigate: (pat
             );
           }
           return (
-            <span key={part.index} className="whitespace-pre-wrap">
-              {part.content}
+            <span key={i} className="whitespace-pre-wrap">
+              {seg}
             </span>
           );
         })}
