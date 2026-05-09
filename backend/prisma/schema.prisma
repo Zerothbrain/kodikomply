@@ -224,7 +224,7 @@ model BenefitInKind {
   id                  Int      @id @default(autoincrement())
   name                String
   valuationMethod     String
-  valuationTable      String?  // JSON string for structured benefit tables
+  valuationTable      String?  @db.LongText // JSON string for structured benefit tables
   isExempt            Boolean  @default(false)
   exemptionConditions String?
   isActive            Boolean  @default(true)
