@@ -405,7 +405,7 @@ model EmailTemplate {
   name        String
   subject     String
   htmlBody    String   @db.LongText
-  textBody    String
+  textBody    String   @db.LongText
   variables   String   @default("[]")
   isActive    Boolean  @default(true)
   updatedBy   Int?
