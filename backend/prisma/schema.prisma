@@ -404,7 +404,7 @@ model EmailTemplate {
   slug        String   @unique
   name        String
   subject     String
-  htmlBody    String
+  htmlBody    String   @db.LongText
   textBody    String
   variables   String   @default("[]")
   isActive    Boolean  @default(true)
