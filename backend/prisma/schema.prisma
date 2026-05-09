@@ -37,7 +37,7 @@ model UserTaxProfile {
   residentStatus    String
   hasEmployees      Boolean  @default(false)
   turnoverBand      String
-  applicableModules String
+  applicableModules String   @db.LongText
   completedModules  String   @default("[]")
   moduleData        String   @default("{}")
   createdAt         DateTime @default(now())
